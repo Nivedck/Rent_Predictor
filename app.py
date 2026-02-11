@@ -79,7 +79,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Modern Rent Predictor")
+st.title("Room Rent Predictor")
 st.caption("Predict monthly rent from BHK, Size (sqft) and City — linear regression model")
 
 with st.form("input_form"):
