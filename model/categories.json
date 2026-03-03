@@ -1,0 +1,30 @@
+{
+  "City": [
+    "Bangalore",
+    "Chennai",
+    "Delhi",
+    "Hyderabad",
+    "Kolkata",
+    "Mumbai"
+  ],
+  "Area Type": [
+    "Built Area",
+    "Carpet Area",
+    "Super Area"
+  ],
+  "Furnishing Status": [
+    "Furnished",
+    "Semi-Furnished",
+    "Unfurnished"
+  ],
+  "Tenant Preferred": [
+    "Bachelors",
+    "Bachelors/Family",
+    "Family"
+  ],
+  "Point of Contact": [
+    "Contact Agent",
+    "Contact Builder",
+    "Contact Owner"
+  ]
+}

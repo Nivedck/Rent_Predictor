@@ -4,19 +4,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Predict monthly room rent from BHK, size and city using a linear regression model.">
+  <meta name="description" content="Predict monthly room rent from property details using a linear regression model.">
   <title>Rent Predictor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-1: #0b1220;
-      --bg-2: #0f172a;
-      --card: #111827;
-      --muted: #94a3b8;
-      --text: #e5e7eb;
+      --bg-deep: #060b18;
+      --bg-mid: #0a1628;
+      --glass: rgba(14, 26, 50, 0.55);
+      --glass-border: rgba(56, 189, 248, 0.12);
+      --glass-hover: rgba(56, 189, 248, 0.18);
+      --muted: #7a8ba8;
+      --text: #dfe6ef;
+      --text-bright: #f0f4f8;
       --accent: #38bdf8;
-      --accent-dark: #0ea5e9;
+      --accent2: #818cf8;
+      --accent3: #22d3ee;
+      --danger: #f87171;
     }
 
     *,
@@ -27,50 +32,145 @@
       padding: 0;
     }
 
-    html {
+    html,
+    body {
       height: 100%;
     }
 
     body {
-      height: 100%;
-      font-family: 'Inter', system-ui, sans-serif;
-      background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-deep);
       color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Animated background ── */
+    .bg-scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 30% 20%, #0c1a35 0%, var(--bg-deep) 70%);
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: .45;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+
+    .orb--1 {
+      width: 380px;
+      height: 380px;
+      background: #0ea5e9;
+      top: -80px;
+      left: -60px;
+    }
+
+    .orb--2 {
+      width: 300px;
+      height: 300px;
+      background: #6366f1;
+      bottom: -60px;
+      right: -40px;
+      animation-delay: -6s;
+      animation-duration: 22s;
+    }
+
+    .orb--3 {
+      width: 200px;
+      height: 200px;
+      background: #22d3ee;
+      top: 40%;
+      right: 15%;
+      animation-delay: -10s;
+      animation-duration: 16s;
+    }
+
+    .orb--4 {
+      width: 140px;
+      height: 140px;
+      background: #818cf8;
+      bottom: 25%;
+      left: 18%;
+      animation-delay: -3s;
+      animation-duration: 20s;
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      50% {
+        transform: translate(30px, -20px) scale(1.08);
+      }
+
+      100% {
+        transform: translate(-20px, 25px) scale(0.95);
+      }
+    }
+
+    /* ── Layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 480px;
-      padding: 24px;
-    }
-
-    h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 0.88rem;
-      margin-bottom: 28px;
-      line-height: 1.5;
+      padding: 40px 20px;
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      border-radius: 16px;
-      padding: 28px 24px;
+      width: 100%;
+      max-width: 840px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      backdrop-filter: blur(28px) saturate(140%);
+      -webkit-backdrop-filter: blur(28px) saturate(140%);
+      overflow: hidden;
+      box-shadow:
+        0 4px 30px rgba(0, 0, 0, .35),
+        inset 0 1px 0 rgba(255, 255, 255, .04);
+      animation: cardIn .5s ease-out;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+    }
+
+    /* ── Left: form ── */
+    .form-section {
+      padding: 36px 32px;
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-bright);
+      letter-spacing: -0.02em;
+    }
+
+    .form-subtitle {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-top: 4px;
+      margin-bottom: 28px;
     }
 
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
+      gap: 16px;
     }
 
     .field {
@@ -82,151 +182,283 @@
       grid-column: 1 / -1;
     }
 
-    label {
-      font-size: 0.82rem;
+    .field label {
+      font-size: .72rem;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
       color: var(--muted);
       margin-bottom: 6px;
-      letter-spacing: 0.03em;
     }
 
-    input,
-    select {
-      background: var(--bg-1);
-      color: var(--text);
-      border: 1px solid rgba(148, 163, 184, 0.3);
+    .field input,
+    .field select {
+      background: rgba(6, 11, 24, .6);
+      color: var(--text-bright);
+      border: 1px solid rgba(120, 140, 180, .18);
       border-radius: 10px;
       padding: 10px 14px;
-      font-size: 0.95rem;
+      font-size: .9rem;
       font-family: inherit;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color .25s, box-shadow .25s;
     }
 
-    input:focus,
-    select:focus {
+    .field input:focus,
+    .field select:focus {
       border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, .12);
     }
 
-    select {
+    .field select {
       cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%237a8ba8' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 34px;
     }
 
     .btn {
-      margin-top: 22px;
-      width: 100%;
-      padding: 12px;
+      grid-column: 1 / -1;
+      margin-top: 8px;
+      padding: 13px;
       border: none;
       border-radius: 12px;
-      background: linear-gradient(90deg, var(--accent-dark), var(--accent));
-      color: var(--bg-1);
-      font-size: 0.95rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-size: .92rem;
       font-weight: 700;
       font-family: inherit;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
+      transition: transform .15s, box-shadow .25s;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, .25);
     }
 
     .btn:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(56, 189, 248, .35);
     }
 
     .btn:active {
       transform: translateY(0);
     }
 
-    /* Result card */
-    .result {
-      margin-top: 20px;
-      padding: 20px 24px;
-      border-radius: 14px;
-      background: rgba(56, 189, 248, 0.06);
-      border: 1px solid rgba(56, 189, 248, 0.2);
+    /* ── Right: result panel ── */
+    .result-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 36px 24px;
+      background: linear-gradient(165deg, rgba(14, 165, 233, .08), rgba(99, 102, 241, .06));
+      border-left: 1px solid var(--glass-border);
       text-align: center;
-      animation: fadeIn 0.35s ease;
+      position: relative;
+      overflow: hidden;
     }
 
-    .result .label {
+    .result-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 70%, rgba(56, 189, 248, .08), transparent 70%);
+    }
+
+    .result-panel .icon-house {
+      width: 52px;
+      height: 52px;
+      margin-bottom: 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, .15), rgba(129, 140, 248, .12));
+      border: 1px solid rgba(56, 189, 248, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .icon-house svg {
+      width: 26px;
+      height: 26px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .result-panel .hint {
+      font-size: .78rem;
       color: var(--muted);
-      font-size: 0.82rem;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
+      position: relative;
     }
 
-    .result .amount {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--accent);
+    .result-panel .amount {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent3), var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
     }
 
-    .result .note {
+    .result-panel .sub-note {
+      margin-top: 14px;
+      font-size: .72rem;
       color: var(--muted);
-      font-size: 0.78rem;
-      margin-top: 10px;
+      max-width: 200px;
+      line-height: 1.5;
+      position: relative;
     }
 
+    .result-panel .empty-state {
+      position: relative;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    .empty-state svg {
+      display: block;
+      margin: 0 auto 12px;
+      opacity: .4;
+    }
+
+    /* ── Error ── */
     .error-box {
-      margin-top: 20px;
-      padding: 14px 18px;
-      border-radius: 12px;
-      background: rgba(239, 68, 68, 0.08);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
-      font-size: 0.88rem;
+      grid-column: 1 / -1;
+      margin-top: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(248, 113, 113, .08);
+      border: 1px solid rgba(248, 113, 113, .25);
+      color: var(--danger);
+      font-size: .85rem;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .card {
+        grid-template-columns: 1fr;
       }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      .result-panel {
+        border-left: none;
+        border-top: 1px solid var(--glass-border);
+        padding: 28px 24px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Room Rent Predictor</h1>
-    <p class="subtitle">Predict monthly rent from BHK, Size (sqft) and City — linear regression model</p>
+  <div class="bg-scene">
+    <div class="orb orb--1"></div>
+    <div class="orb orb--2"></div>
+    <div class="orb orb--3"></div>
+    <div class="orb orb--4"></div>
+  </div>
 
-    <form class="card" action="/predict" method="post">
-      <div class="form-grid">
-        <div class="field">
-          <label for="bhk">BHK</label>
-          <input type="number" id="bhk" name="bhk" min="1" max="10" step="1" value="{{ bhk | default(2) }}">
+  <div class="page">
+    <div class="card">
+      <!-- LEFT: Form -->
+      <form class="form-section" action="/predict" method="post">
+        <div class="form-title">Room Rent Predictor</div>
+        <p class="form-subtitle">Enter property details to estimate monthly rent</p>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="bhk">BHK</label>
+            <input type="number" id="bhk" name="bhk" min="1" max="10" step="1"
+              value="{{ form.bhk if form is defined and form.bhk else 2 }}">
+          </div>
+          <div class="field">
+            <label for="size">Size (sqft)</label>
+            <input type="number" id="size" name="size" min="20" max="10000" step="10"
+              value="{{ form.size if form is defined and form.size else 800 }}">
+          </div>
+
+          <div class="field">
+            <label for="bathroom">Bathrooms</label>
+            <input type="number" id="bathroom" name="bathroom" min="1" max="10" step="1"
+              value="{{ form.bathroom if form is defined and form.bathroom else 1 }}">
+          </div>
+          <div class="field">
+            <label for="city">City</label>
+            <select id="city" name="city">
+              {% for c in categories["City"] %}
+              <option value="{{ c }}" {% if form is defined and form.city==c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="area_type">Area Type</label>
+            <select id="area_type" name="area_type">
+              {% for a in categories["Area Type"] %}
+              <option value="{{ a }}" {% if form is defined and form.area_type==a %}selected{% endif %}>{{ a }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="furnishing">Furnishing</label>
+            <select id="furnishing" name="furnishing">
+              {% for f in categories["Furnishing Status"] %}
+              <option value="{{ f }}" {% if form is defined and form.furnishing==f %}selected{% endif %}>{{ f }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="tenant">Tenant Type</label>
+            <select id="tenant" name="tenant">
+              {% for t in categories["Tenant Preferred"] %}
+              <option value="{{ t }}" {% if form is defined and form.tenant==t %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="contact">Contact Via</label>
+            <select id="contact" name="contact">
+              {% for p in categories["Point of Contact"] %}
+              <option value="{{ p }}" {% if form is defined and form.contact==p %}selected{% endif %}>{{ p }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <button type="submit" class="btn" id="predict-btn">Predict Rent</button>
+
+          {% if error %}
+          <div class="error-box">{{ error }}</div>
+          {% endif %}
         </div>
-        <div class="field">
-          <label for="size">Size (sqft)</label>
-          <input type="number" id="size" name="size" min="20" max="10000" step="10" value="{{ size | default(800) }}">
+      </form>
+
+      <!-- RIGHT: Result panel -->
+      <div class="result-panel">
+        {% if prediction is defined and prediction is not none %}
+        <div class="icon-house">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
+            <path d="M9 22V12h6v10" />
+          </svg>
         </div>
-        <div class="field full">
-          <label for="city">City</label>
-          <select id="city" name="city">
-            {% for c in cities %}
-            <option value="{{ c }}" {% if city==c %}selected{% endif %}>{{ c }}</option>
-            {% endfor %}
-          </select>
+        <div class="hint">Predicted Monthly Rent</div>
+        <div class="amount">₹ {{ "{:,.0f}".format(prediction) }}</div>
+        <div class="sub-note">Based on linear regression trained on the included dataset</div>
+        {% else %}
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
+            <path d="M9 22V12h6v10" />
+          </svg>
+          Fill in the details &amp; hit<br><strong>Predict Rent</strong>
         </div>
+        {% endif %}
       </div>
-      <button type="submit" class="btn" id="predict-btn">Predict Rent</button>
-    </form>
-
-    {% if prediction is defined and prediction is not none %}
-    <div class="result">
-      <div class="label">Estimated Monthly Rent</div>
-      <div class="amount">₹ {{ "{:,.0f}".format(prediction) }}</div>
-      <div class="note">Based on a simple linear regression trained on the included dataset.</div>
     </div>
-    {% endif %}
-
-    {% if error %}
-    <div class="error-box">{{ error }}</div>
-    {% endif %}
   </div>
 </body>
 
