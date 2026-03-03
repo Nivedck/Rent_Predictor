@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Predict monthly room rent from BHK, size and city using a linear regression model.">
+  <title>Rent Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #0b1220;
+      --bg-2: #0f172a;
+      --card: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 16px;
+      padding: 28px 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.03em;
+    }
+
+    input,
+    select {
+      background: var(--bg-1);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .btn {
+      margin-top: 22px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+      color: var(--bg-1);
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Result card */
+    .result {
+      margin-top: 20px;
+      padding: 20px 24px;
+      border-radius: 14px;
+      background: rgba(56, 189, 248, 0.06);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      text-align: center;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .result .label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
+
+    .result .amount {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .result .note {
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 10px;
+    }
+
+    .error-box {
+      margin-top: 20px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      font-size: 0.88rem;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Room Rent Predictor</h1>
+    <p class="subtitle">Predict monthly rent from BHK, Size (sqft) and City — linear regression model</p>
+
+    <form class="card" action="/predict" method="post">
+      <div class="form-grid">
+        <div class="field">
+          <label for="bhk">BHK</label>
+          <input type="number" id="bhk" name="bhk" min="1" max="10" step="1" value="{{ bhk | default(2) }}">
+        </div>
+        <div class="field">
+          <label for="size">Size (sqft)</label>
+          <input type="number" id="size" name="size" min="20" max="10000" step="10" value="{{ size | default(800) }}">
+        </div>
+        <div class="field full">
+          <label for="city">City</label>
+          <select id="city" name="city">
+            {% for c in cities %}
+            <option value="{{ c }}" {% if city==c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn" id="predict-btn">Predict Rent</button>
+    </form>
+
+    {% if prediction is defined and prediction is not none %}
+    <div class="result">
+      <div class="label">Estimated Monthly Rent</div>
+      <div class="amount">₹ {{ "{:,.0f}".format(prediction) }}</div>
+      <div class="note">Based on a simple linear regression trained on the included dataset.</div>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error-box">{{ error }}</div>
+    {% endif %}
+  </div>
+</body>
+
+</html>
