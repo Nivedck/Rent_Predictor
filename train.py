@@ -93,7 +93,6 @@ def train_and_save(df, out_dir="model"):
 def main():
     base = os.path.dirname(__file__)
     paths = [
-        os.path.join(base, "rent_data.csv"),
         os.path.join(base, "rent2.csv"),
     ]
     df = load_data(paths)
